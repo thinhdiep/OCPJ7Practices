@@ -1,10 +1,7 @@
 package nio;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 /**
@@ -70,6 +67,19 @@ public class NIOImpl implements NIO {
             }
         } else {
             System.out.println("File does not exist ");
+        }
+    }
+
+    @Override
+    public void copyFiles(String sourcePath, String destinationPath) {
+        Path source = Paths.get(sourcePath);
+        Path destination = Paths.get(destinationPath);
+
+        try {
+            Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("copy successfull");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

@@ -36,5 +36,6 @@ public class NIOConsole implements Console {
     public void showResults() {
         nioImpl.showPathInformation("E:\\TestNewIO");
         nioImpl.showFilesInformation("E:\\TestNewIO\\Test2.txt");
+        nioImpl.copyFiles("E:\\TestNewIO\\Test2.txt", "E:\\Test");
     }
 }

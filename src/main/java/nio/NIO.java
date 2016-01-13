@@ -7,4 +7,6 @@ import java.io.IOException;
  */
 public interface NIO {
     void showPathInformation(String path);
+
+    void showFilesInformation(String path);
 }

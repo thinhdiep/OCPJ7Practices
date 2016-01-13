@@ -1,6 +1,8 @@
 package nio;
 
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -19,11 +21,13 @@ public class NIOImpl implements NIO {
      * @param path The path to show information
      */
     @Override
-    public void showPathInformation(String path) {
+    public void showPathInformation(String path){
         Path currentPath = Paths.get(path);
         if (Files.exists(currentPath)) {
             System.out.println("The absolute path is: " + currentPath.toAbsolutePath());
             System.out.println("The URI path is: " + currentPath.toUri());
+            System.out.println("The normalized path is: " + currentPath.normalize());
+
         } else {
             System.out.println("The file/folder does not exist ");
         }

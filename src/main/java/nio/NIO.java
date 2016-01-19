@@ -10,5 +10,10 @@ public interface NIO {
 
     void showFilesInformation(String path);
 
+    void showDirectoryInformation(String path);
+
     void copyFiles(String sourcePath, String destinationPath);
+
+    void copyDirectory(String sourcePath, String destinationPath);
+
 }

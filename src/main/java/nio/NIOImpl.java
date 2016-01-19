@@ -1,8 +1,13 @@
 package nio;
 
+import com.sun.deploy.util.StringUtils;
+
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Concrete class of <code>NIO</code> interface
@@ -52,7 +57,6 @@ public class NIOImpl implements NIO {
 //
 //                System.out.println("Lat modified time is: " + object);
 
-
                 /*
                  * Method 2 to get files attributes
                  */
@@ -71,15 +75,82 @@ public class NIOImpl implements NIO {
     }
 
     @Override
+    public void showDirectoryInformation(String path) {
+        Path sourcePath = Paths.get(path);
+
+        try {
+            Files.walkFileTree(sourcePath, new FileVisistorForReading());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
     public void copyFiles(String sourcePath, String destinationPath) {
         Path source = Paths.get(sourcePath);
         Path destination = Paths.get(destinationPath);
-
         try {
             Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
             System.out.println("copy successfull");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void copyDirectory(final String base, String target) {
+        Path baseLocation = Paths.get(base);
+        Path targetLocation = Paths.get(target).resolve(baseLocation.getRoot().relativize(baseLocation));
+
+        try {
+            if (!Files.exists(targetLocation)) {
+                Files.copy(baseLocation, targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            } else {
+                int next = 0;
+                targetLocation = Paths.get(targetLocation.toString() + String.valueOf(next));
+                while (Files.exists(targetLocation)) {
+                    String newTarget = targetLocation.toString();
+                    targetLocation = Paths.get(newTarget.replace(newTarget.substring(newTarget.length() - 1), String.valueOf(next)));
+
+                    next++;
+                }
+                Files.copy(baseLocation, targetLocation, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            Files.walkFileTree(baseLocation, new FileVisitorForCopying(baseLocation, targetLocation));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void generateRecursiveFolder(String path, int limit) {
+
+        Path baseLocation = Paths.get(path);
+        String fileName = baseLocation.getFileName().toString() + "-1";
+        for (int i = 0; i < limit; i++){
+            Path innerPath = baseLocation.resolve(fileName.replace(String.valueOf(i - 1), String.valueOf(i)));
+            try {
+                Files.createDirectory(innerPath);
+                baseLocation = innerPath;
+                fileName = innerPath.getFileName().toString();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public List<Path> findFile(String baseLocation, String regexPattern) {
+        List<Path> result = new LinkedList<>();
+        try {
+            Files.walkFileTree(Paths.get(baseLocation), new FileVisitorForFinding(regexPattern, result));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("size " + result.size());
+        for (Path p : result) {
+            System.out.println("Finded " + p.getFileName());
+        }
+        return result;
     }
 }
